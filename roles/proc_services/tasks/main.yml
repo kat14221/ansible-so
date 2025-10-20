@@ -1,0 +1,31 @@
+---
+# Gestión de procesos y servicios
+
+- name: Instalar paquetes comunes de monitoreo y utilidades
+  package:
+    name: "{{ proc_services_packages_common }}"
+    state: present
+  tags: ["proc", "packages"]
+
+- name: Asegurar estado de servicios definidos
+  vars:
+    _unit: "{{ item.unit | default(item.name) }}"
+  systemd:
+    name: "{{ _unit }}"
+    state: "{{ item.state | default('started') }}"
+    enabled: "{{ item.enabled | default(true) }}"
+    daemon_reload: "{{ item.daemon_reload | default(false) }}"
+  loop: "{{ proc_services_services }}"
+  when: proc_services_services | length > 0
+  tags: ["services"]
+
+- name: Mostrar procesos principales (diagnóstico)
+  shell: ps aux --sort=-%mem | head -n 15
+  register: ps_output
+  changed_when: false
+  tags: ["proc", "diagnostic"]
+
+- name: Imprimir top procesos (salida ps)
+  debug:
+    var: ps_output.stdout_lines
+  tags: ["proc", "diagnostic"]

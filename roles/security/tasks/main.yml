@@ -1,0 +1,25 @@
+---
+# Endurecimiento básico: sysctl y permisos de archivos críticos
+
+- name: Aplicar parámetros sysctl de seguridad (persistente)
+  copy:
+    dest: /etc/sysctl.d/99-security.conf
+    content: |
+      {% for key, val in security_sysctl.items() %}
+      {{ key }} = {{ val }}
+      {% endfor %}
+    owner: root
+    group: root
+    mode: '0644'
+  notify: aplicar-sysctl
+  tags: ["security", "sysctl"]
+
+- name: Asegurar permisos de archivos críticos
+  file:
+    path: "{{ item.path }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0644') }}"
+  loop: "{{ security_critical_files }}"
+  when: security_critical_files | length > 0
+  tags: ["security", "perms"]

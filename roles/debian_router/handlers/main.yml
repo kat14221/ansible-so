@@ -1,0 +1,16 @@
+---
+# Handlers para debian_router
+
+- name: aplicar-sysctl
+  command: sysctl --system
+  changed_when: false
+
+- name: recargar-nftables
+  systemd:
+    name: nftables
+    state: restarted
+
+- name: reiniciar-dnsmasq
+  systemd:
+    name: dnsmasq
+    state: restarted

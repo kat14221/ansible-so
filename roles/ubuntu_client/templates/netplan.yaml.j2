@@ -1,0 +1,17 @@
+# Archivo generado por Ansible para configuración estática en Ubuntu (Netplan)
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    {{ client_interface }}:
+      dhcp4: no
+      addresses:
+        - {{ client_ip }}/{{ client_prefix }}
+      routes:
+        - to: 0.0.0.0/0
+          via: {{ client_gateway }}
+      nameservers:
+        addresses:
+{% for dns in client_dns_servers %}
+          - {{ dns }}
+{% endfor %}

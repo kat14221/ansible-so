@@ -1,0 +1,26 @@
+---
+automation_cron_jobs: []
+automation_updates:
+  enabled: true
+  schedule:
+    minute: "0"
+    hour: "3"
+  command: "DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade"
+
+automation_cleanup:
+  enabled: true
+  schedule:
+    minute: "30"
+    hour: "3"
+  command: "journalctl --vacuum-time=14d && find /var/log -type f -name '*log*' -mtime +30 -delete"
+
+automation_backup:
+  enabled: false
+  schedule:
+    minute: "0"
+    hour: "2"
+  script_path: "/usr/local/sbin/ansible-backup.sh"
+  src_paths:
+    - /etc
+  dest_path: "/var/backups/ansible"
+  retention_days: 7

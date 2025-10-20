@@ -1,0 +1,6 @@
+---
+# Handlers para users
+
+- name: validar-sudoers
+  command: visudo -cf /etc/sudoers
+  changed_when: false

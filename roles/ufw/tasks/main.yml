@@ -1,0 +1,49 @@
+---
+# Configuración de UFW en clientes Ubuntu
+
+- name: Instalar ufw
+  apt:
+    name: ufw
+    state: present
+    update_cache: true
+  tags: ["ufw"]
+  when: ufw_enabled | default(false)
+
+- name: Establecer políticas por defecto
+  community.general.ufw:
+    state: enabled
+    policy: "{{ ufw_default_incoming }}"
+    direction: incoming
+  when: ufw_enabled | default(false)
+  tags: ["ufw"]
+
+- name: Establecer política de salida
+  community.general.ufw:
+    state: enabled
+    policy: "{{ ufw_default_outgoing }}"
+    direction: outgoing
+  when: ufw_enabled | default(false)
+  tags: ["ufw"]
+
+- name: Configurar nivel de logging
+  community.general.ufw:
+    logging: "{{ ufw_logging }}"
+  when: ufw_enabled | default(false)
+  tags: ["ufw"]
+
+- name: Aplicar reglas permitidas
+  community.general.ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port | default(omit) }}"
+    proto: "{{ item.proto | default(omit) }}"
+    from_ip: "{{ item.from_ip | default(omit) }}"
+    to_ip: "{{ item.to_ip | default(omit) }}"
+  loop: "{{ ufw_allowed_rules }}"
+  when: ufw_enabled | default(false)
+  tags: ["ufw"]
+
+- name: Habilitar UFW
+  community.general.ufw:
+    state: enabled
+  when: ufw_enabled | default(false)
+  tags: ["ufw"]

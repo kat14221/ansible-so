@@ -1,0 +1,14 @@
+---
+ufw_enabled: false
+ufw_default_incoming: deny
+ufw_default_outgoing: allow
+ufw_logging: low
+
+# Reglas permitidas por defecto (puedes sobrescribir en group_vars/host_vars)
+ufw_allowed_rules:
+  - { rule: allow, port: 22, proto: tcp }
+  # DNS desde/ hacia gateway si aplica
+  - { rule: allow, port: 53, proto: tcp }
+  - { rule: allow, port: 53, proto: udp }
+  # ICMP (ping)
+  - { rule: allow, proto: icmp }

@@ -1,0 +1,19 @@
+---
+# Configuración de red estática mediante Netplan en Ubuntu
+
+- name: Asegurar paquete netplan instalado (Ubuntu server suele traerlo)
+  apt:
+    name: netplan.io
+    state: present
+    update_cache: true
+  tags: ["client", "net"]
+
+- name: Desplegar configuración Netplan
+  template:
+    src: netplan.yaml.j2
+    dest: /etc/netplan/01-lab-static.yaml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: aplicar-netplan
+  tags: ["client", "net"]

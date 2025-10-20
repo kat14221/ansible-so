@@ -1,0 +1,68 @@
+---
+# Automatización de tareas (cron, tareas programadas)
+
+- name: Crear directorio de backups si está habilitado
+  file:
+    path: "{{ automation_backup.dest_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'
+  when: automation_backup.enabled | default(false)
+  tags: ["automation", "backup"]
+
+- name: Desplegar script de backup si está habilitado
+  template:
+    src: backup.sh.j2
+    dest: "{{ automation_backup.script_path }}"
+    owner: root
+    group: root
+    mode: '0750'
+  when: automation_backup.enabled | default(false)
+  tags: ["automation", "backup"]
+
+- name: Programar actualizaciones de seguridad automáticas si está habilitado
+  cron:
+    name: "ansible: security updates"
+    minute: "{{ automation_updates.schedule.minute }}"
+    hour: "{{ automation_updates.schedule.hour }}"
+    user: root
+    job: "{{ automation_updates.command }}"
+    state: "{{ (automation_updates.enabled | default(true)) | ternary('present','absent') }}"
+  tags: ["automation", "updates", "cron"]
+
+- name: Programar limpieza de logs si está habilitado
+  cron:
+    name: "ansible: log cleanup"
+    minute: "{{ automation_cleanup.schedule.minute }}"
+    hour: "{{ automation_cleanup.schedule.hour }}"
+    user: root
+    job: "{{ automation_cleanup.command }}"
+    state: "{{ (automation_cleanup.enabled | default(true)) | ternary('present','absent') }}"
+  tags: ["automation", "cleanup", "cron"]
+
+- name: Programar backup diario si está habilitado
+  cron:
+    name: "ansible: daily backup"
+    minute: "{{ automation_backup.schedule.minute }}"
+    hour: "{{ automation_backup.schedule.hour }}"
+    user: root
+    job: "{{ automation_backup.script_path }}"
+    state: "{{ (automation_backup.enabled | default(false)) | ternary('present','absent') }}"
+  when: automation_backup.enabled | default(false)
+  tags: ["automation", "backup", "cron"]
+
+- name: Gestionar cron jobs declarativos
+  cron:
+    name: "{{ item.name }}"
+    minute: "{{ item.minute | default('*') }}"
+    hour: "{{ item.hour | default('*') }}"
+    day: "{{ item.day | default('*') }}"
+    month: "{{ item.month | default('*') }}"
+    weekday: "{{ item.weekday | default('*') }}"
+    user: "{{ item.user | default('root') }}"
+    job: "{{ item.job }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ automation_cron_jobs }}"
+  when: automation_cron_jobs | length > 0
+  tags: ["automation", "cron"]

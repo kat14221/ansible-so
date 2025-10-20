@@ -1,0 +1,12 @@
+---
+router_external_interface: eth0
+router_internal_interface: eth1
+router_gateway_ip: 10.10.10.1
+router_internal_cidr: 10.10.10.0/29
+router_dns_domain: lab.local
+router_dns_upstreams:
+  - 8.8.8.8
+  - 1.1.1.1
+router_dhcp_range_start: 10.10.10.5
+router_dhcp_range_end: 10.10.10.6
+router_dhcp_lease: 12h

@@ -1,0 +1,23 @@
+# Archivo generado por Ansible para dnsmasq (DHCP + DNS)
+# Interfaz interna del laboratorio
+interface={{ router_internal_interface }}
+bind-interfaces
+
+# Dominio local
+domain={{ router_dns_domain }}
+expand-hosts
+
+# Servidores DNS upstream
+{% for dns in router_dns_upstreams %}
+server={{ dns }}
+{% endfor %}
+
+# Rango DHCP (ajustado al /29)
+dhcp-range={{ router_dhcp_range_start }},{{ router_dhcp_range_end }},{{ router_dns_domain }},{{ router_dhcp_lease }}
+
+# Gateway y DNS ofrecidos por DHCP
+dhcp-option=option:router,{{ router_gateway_ip }}
+dhcp-option=option:dns-server,{{ router_gateway_ip }}
+
+# Evitar leer archivos adicionales de conf.d por defecto
+conf-dir=

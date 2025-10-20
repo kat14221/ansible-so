@@ -1,0 +1,41 @@
+---
+# Administración del almacenamiento y sistemas de archivos
+
+- name: Gestionar particiones de disco (parted)
+  community.general.parted:
+    device: "{{ item.device }}"
+    number: "{{ item.number }}"
+    label: "{{ item.label | default(omit) }}"
+    part_type: "{{ item.part_type | default(omit) }}"
+    name: "{{ item.name | default(omit) }}"
+    flags: "{{ item.flags | default(omit) }}"
+    unit: MiB
+    state: "{{ item.state | default('present') }}"
+    part_start: "{{ item.start | default(omit) }}"
+    part_end: "{{ item.end | default(omit) }}"
+  loop: "{{ storage_partitions | default([]) }}"
+  when: storage_partitions is defined and storage_partitions | length > 0
+  tags: ["storage", "disk", "parted"]
+
+- name: Crear sistemas de archivos cuando corresponda
+  filesystem:
+    fstype: "{{ item.fstype }}"
+    dev: "{{ item.device }}"
+    force: "{{ item.force | default(false) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ storage_filesystems }}"
+  when:
+    - storage_filesystems | length > 0
+    - item.state | default('present') != 'absent'
+  tags: ["storage", "fs", "mkfs"]
+
+- name: Gestionar puntos de montaje
+  mount:
+    src: "{{ item.src }}"
+    path: "{{ item.path }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.opts | default('defaults') }}"
+    state: "{{ item.state | default('mounted') }}"
+  loop: "{{ storage_mounts }}"
+  when: storage_mounts | length > 0
+  tags: ["storage", "mount"]

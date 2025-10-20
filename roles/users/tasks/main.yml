@@ -1,0 +1,43 @@
+---
+# Administración de usuarios, permisos y políticas
+
+- name: Crear grupos
+  group:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ users_groups }}"
+  when: users_groups | length > 0
+  tags: ["users", "groups"]
+
+- name: Gestionar cuentas de usuario
+  user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid | default(omit) }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    groups: "{{ (item.groups | default([])) | join(',') if (item.groups | default([])) | length > 0 else omit }}"
+    password: "{{ item.password | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+    update_password: on_create
+    createhome: true
+  loop: "{{ users_accounts }}"
+  when: users_accounts | length > 0
+  tags: ["users", "accounts"]
+
+- name: Configurar claves SSH autorizadas
+  authorized_key:
+    user: "{{ item.0.name }}"
+    key: "{{ item.1 }}"
+    state: present
+  loop: "{{ users_accounts | subelements('ssh_authorized_keys', skip_missing=True) }}"
+  tags: ["users", "ssh"]
+
+- name: Desplegar política sudoers si está habilitado
+  when: users_sudo.enabled | default(true)
+  template:
+    src: sudoers.j2
+    dest: /etc/sudoers.d/99-ansible
+    owner: root
+    group: root
+    mode: '0440'
+  notify: validar-sudoers
+  tags: ["users", "sudo"]

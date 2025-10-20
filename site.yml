@@ -1,0 +1,23 @@
+---
+- name: Configurar Gateway Debian
+  hosts: debian_gateway
+  become: true
+  gather_facts: true
+
+  roles:
+    - { role: security,      tags: ["security", "sysctl", "perms"] }
+    - { role: debian_router, tags: ["router", "nat", "dhcp", "dns"] }
+    - { role: storage,       tags: ["storage", "disk", "fs"] }
+
+- name: Configurar PCs Ubuntu
+  hosts: ubuntu_pcs
+  become: true
+  gather_facts: true
+
+  roles:
+    - { role: security,      tags: ["security", "sysctl", "perms"] }
+    - { role: ubuntu_client, tags: ["client", "net"] }
+    - { role: ufw,           tags: ["ufw", "firewall"] }
+    - { role: proc_services, tags: ["proc", "services"] }
+    - { role: users,         tags: ["users", "permissions"] }
+    - { role: automation,    tags: ["automation", "cron"] }

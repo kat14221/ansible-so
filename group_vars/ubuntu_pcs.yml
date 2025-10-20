@@ -1,0 +1,19 @@
+---
+# Variables comunes para PCs Ubuntu
+client_gateway: 10.10.10.1
+client_dns_servers:
+  - 10.10.10.1
+  - 8.8.8.8
+client_interface: ens33  # ajusta según tu entorno
+client_prefix: 29         # /29 -> 255.255.255.248
+
+# UFW por host (firewall sencillo). Puedes deshabilitarlo si no lo necesitas.
+ufw_enabled: true
+ufw_default_incoming: deny
+ufw_default_outgoing: allow
+ufw_logging: low
+ufw_allowed_rules:
+  - { rule: allow, port: 22, proto: tcp }
+  - { rule: allow, port: 53, proto: tcp }
+  - { rule: allow, port: 53, proto: udp }
+  - { rule: allow, proto: icmp }

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEST="{{ automation_backup.dest_path }}"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+ARCHIVE="$DEST/backup-$STAMP.tar.gz"
+RETENTION={{ automation_backup.retention_days | default(7) }}
+
+mkdir -p "$DEST"
+
+tar -czpf "$ARCHIVE" \
+{% for p in automation_backup.src_paths %}
+  "{{ p }}" \
+{% endfor %}
+  --warning=no-file-changed
+
+echo "[backup] Created $ARCHIVE"
+
+# Prune old backups
+find "$DEST" -maxdepth 1 -type f -name 'backup-*.tar.gz' -mtime +$RETENTION -print -delete

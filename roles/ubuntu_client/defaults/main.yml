@@ -1,0 +1,7 @@
+---
+client_interface: ens33
+client_ip: 10.10.10.2
+client_prefix: 29
+client_gateway: 10.10.10.1
+client_dns_servers:
+  - 10.10.10.1

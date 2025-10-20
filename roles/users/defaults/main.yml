@@ -1,0 +1,8 @@
+---
+users_groups: []
+users_accounts: []
+users_sudo:
+  enabled: true
+  group: sudo
+  nopasswd: true
+  extra_rules: []

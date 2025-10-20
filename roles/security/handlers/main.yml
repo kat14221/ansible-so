@@ -1,0 +1,6 @@
+---
+# Handlers para security
+
+- name: aplicar-sysctl
+  command: sysctl --system
+  changed_when: false

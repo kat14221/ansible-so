@@ -1,0 +1,6 @@
+---
+# Handlers para proc_services
+
+- name: daemon-reload
+  systemd:
+    daemon_reload: true

@@ -1,0 +1,59 @@
+---
+# Variables globales de ejemplo. Ajusta según tu entorno.
+
+# Role: proc_services
+proc_services_packages_common:
+  - procps
+  - sysstat
+  - lsof
+
+proc_services_services: []
+# - name: ssh
+#   state: started
+#   enabled: true
+#   daemon_reload: false
+#   unit: ssh
+
+# Role: users
+users_groups:
+  - name: devs
+    state: present
+
+users_accounts: []
+# - name: alice
+#   uid: 1010
+#   groups: ["devs"]
+#   shell: /bin/bash
+#   state: present
+#   password: "!"  # Deja bloqueada la contraseña por defecto
+#   ssh_authorized_keys:
+#     - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMOCKEY alice@host"
+
+users_sudo:
+  enabled: true
+  group: sudo
+  nopasswd: true
+  extra_rules: []
+  # - "%devs ALL=(ALL) NOPASSWD: /usr/bin/systemctl"
+
+# Role: automation
+automation_cron_jobs: []
+# - name: limpiar_tmp
+#   minute: "0"
+#   hour: "3"
+#   user: root
+#   job: "find /tmp -type f -mtime +7 -delete"
+
+# Role: storage
+storage_filesystems: []
+# - device: /dev/sdb1
+#   fstype: ext4
+#   force: false
+#   state: present  # present|absent
+
+storage_mounts: []
+# - src: /dev/sdb1
+#   path: /mnt/data
+#   fstype: ext4
+#   opts: defaults
+#   state: mounted  # mounted|unmounted|present|absent

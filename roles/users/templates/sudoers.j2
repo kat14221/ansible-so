@@ -1,0 +1,11 @@
+# Archivo generado por Ansible. No editar manualmente.
+Defaults env_reset
+Defaults mail_badpass
+
+# Grupo principal con privilegios sudo
+%{{ users_sudo.group | default('sudo') }} ALL=(ALL:ALL) {{ 'NOPASSWD:' if (users_sudo.nopasswd | default(true)) else '' }}ALL
+
+# Reglas adicionales
+{% for rule in users_sudo.extra_rules | default([]) %}
+{{ rule }}
+{% endfor %}

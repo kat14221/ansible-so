@@ -1,0 +1,55 @@
+# Archivo generado por Ansible: nftables NAT y firewall básico
+flush ruleset
+
+table inet filter {
+  chain input {
+    type filter hook input priority 0;
+    policy drop;
+
+    # Permitir tráfico local
+    iif lo accept
+
+    # Permitir conexiones establecidas/relacionadas
+    ct state established,related accept
+
+    # ICMP para diagnóstico
+    ip protocol icmp accept
+    ip6 nexthdr ipv6-icmp accept
+
+    # SSH en el gateway (opcional)
+    tcp dport 22 accept
+
+    # Permitir DHCP/DNS en interfaz interna
+    iif "{{ router_internal_interface }}" udp dport { 53, 67 } accept
+    iif "{{ router_internal_interface }}" tcp dport 53 accept
+  }
+
+  chain forward {
+    type filter hook forward priority 0;
+    policy drop;
+
+    ct state established,related accept
+
+    # Permitir reenvío desde red interna hacia cualquier destino (salida a Internet)
+    iif "{{ router_internal_interface }}" oif "{{ router_external_interface }}" accept
+
+    # Permitir respuesta del externo al interno
+    iif "{{ router_external_interface }}" oif "{{ router_internal_interface }}" ct state related,established accept
+  }
+
+  chain output {
+    type filter hook output priority 0;
+    policy accept;
+  }
+}
+
+table ip nat {
+  chain prerouting {
+    type nat hook prerouting priority -100;
+  }
+  chain postrouting {
+    type nat hook postrouting priority 100;
+    # Masquerade para tráfico que sale por la interfaz externa
+    oif "{{ router_external_interface }}" masquerade
+  }
+}

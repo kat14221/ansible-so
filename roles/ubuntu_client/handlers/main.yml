@@ -1,0 +1,6 @@
+---
+# Handlers para ubuntu_client
+
+- name: aplicar-netplan
+  command: netplan apply
+  changed_when: false
