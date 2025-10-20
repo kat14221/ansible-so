@@ -12,6 +12,6 @@ network:
           via: {{ client_gateway }}
       nameservers:
         addresses:
-{% for dns in client_dns_servers %}
+{% for dns in (client_dns | default(client_dns_servers)) %}
           - {{ dns }}
 {% endfor %}

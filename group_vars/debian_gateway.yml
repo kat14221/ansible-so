@@ -1,26 +1,28 @@
 ---
 # Variables para el gateway Debian
-router_external_interface: eth0
-router_internal_interface: eth1
+router_external_interface: ens192   # WAN – VM Network (172.17.25.54)
+router_internal_interface: ens224   # LAN – LabB
+
 router_gateway_ip: 10.10.10.1
 router_internal_cidr: 10.10.10.0/29
-router_dns_domain: lab.local
-router_dns_upstreams:
-  - 8.8.8.8
-  - 1.1.1.1
 
-# Rango DHCP dentro de /29, dejando 10.10.10.2-10.10.10.4 para IPs estáticas
-router_dhcp_range_start: 10.10.10.5
-router_dhcp_range_end: 10.10.10.6
+# Red persistente en la LAN (ifupdown para Debian 9)
+router_network_persist: true
+router_network_backend: networkd
+router_internal_address: 10.10.10.1
+router_internal_prefix: 29
+
+# NAT + forwarding handled por el rol
+
+# dnsmasq (DHCP/DNS) en la LAN
+dnsmasq_enabled: true
+dnsmasq_domain: labb.local
+dnsmasq_dhcp_range_start: 10.10.10.5
+dnsmasq_dhcp_range_end: 10.10.10.6
 router_dhcp_lease: 12h
+upstream_dns:
+  - 1.1.1.1
+  - 8.8.8.8
 
 # Disco y particiones ejemplo (ajusta al entorno real)
 storage_partitions: []
-# - device: /dev/sda
-#   number: 1
-#   label: primary
-#   part_type: primary   # primary|logical|extended
-#   fs_type: ext4        # si defines fs_type, se formatea luego
-#   start: 1MiB
-#   end: 20GiB
-#   state: present       # present|absent

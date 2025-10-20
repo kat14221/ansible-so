@@ -14,3 +14,7 @@
   systemd:
     name: dnsmasq
     state: restarted
+
+- name: aplicar-red
+  command: /sbin/ifup {{ router_internal_interface }}
+  changed_when: false

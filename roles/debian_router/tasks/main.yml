@@ -10,6 +10,36 @@
     update_cache: true
   tags: ["router", "packages"]
 
+- name: Configurar red LAN persistente (ifupdown) si se solicita
+  template:
+    src: interfaces.lan.j2
+    dest: "/etc/network/interfaces.d/{{ router_internal_interface }}.cfg"
+    owner: root
+    group: root
+    mode: '0644'
+  when: router_network_persist | default(false) and (router_network_backend | default('networkd')) == 'ifupdown'
+  notify: aplicar-red
+  tags: ["router", "network"]
+
+- name: Configurar red LAN persistente (systemd-networkd) si se solicita
+  template:
+    src: lan.network.j2
+    dest: "/etc/systemd/network/10-{{ router_internal_interface }}.network"
+    owner: root
+    group: root
+    mode: '0644'
+  when: router_network_persist | default(false) and (router_network_backend | default('networkd')) == 'networkd'
+  notify: reiniciar-networkd
+  tags: ["router", "network"]
+
+- name: Asegurar systemd-networkd habilitado y activo si se usa networkd
+  systemd:
+    name: systemd-networkd
+    enabled: true
+    state: started
+  when: router_network_persist | default(false) and (router_network_backend | default('networkd')) == 'networkd'
+  tags: ["router", "network"]
+
 - name: Habilitar IP forwarding IPv4 de forma persistente
   copy:
     dest: /etc/sysctl.d/99-router.conf
@@ -51,6 +81,7 @@
     group: root
     mode: '0644'
   notify: reiniciar-dnsmasq
+  when: dnsmasq_enabled | default(true)
   tags: ["router", "dhcp", "dns"]
 
 - name: Asegurar servicio dnsmasq habilitado y activo
@@ -58,4 +89,5 @@
     name: dnsmasq
     state: started
     enabled: true
+  when: dnsmasq_enabled | default(true)
   tags: ["router", "dhcp", "dns"]

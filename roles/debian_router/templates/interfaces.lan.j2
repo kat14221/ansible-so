@@ -1,0 +1,7 @@
+# Archivo generado por Ansible: configuración persistente de LAN (Debian 9 ifupdown)
+# Interfaz LAN: {{ router_internal_interface }}
+auto {{ router_internal_interface }}
+allow-hotplug {{ router_internal_interface }}
+iface {{ router_internal_interface }} inet static
+    address {{ router_internal_address }}
+    netmask {{ (router_internal_prefix | int) | ipaddr('netmask') }}

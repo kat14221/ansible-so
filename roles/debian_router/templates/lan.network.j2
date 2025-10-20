@@ -1,0 +1,6 @@
+# Archivo generado por Ansible: systemd-networkd (Debian 13)
+[Match]
+Name={{ router_internal_interface }}
+
+[Network]
+Address={{ router_internal_address }}/{{ router_internal_prefix }}
