@@ -16,3 +16,6 @@ router_network_persist: false
 router_network_backend: networkd   # networkd|ifupdown
 router_internal_address: 10.10.10.1
 router_internal_prefix: 29
+
+# Resolver: desactivar stub listener para evitar conflicto en :53
+resolved_disable_stub: true

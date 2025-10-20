@@ -40,6 +40,19 @@
   when: router_network_persist | default(false) and (router_network_backend | default('networkd')) == 'networkd'
   tags: ["router", "network"]
 
+- name: Desactivar DNSStubListener de systemd-resolved si se solicita
+  copy:
+    dest: /etc/systemd/resolved.conf.d/disable-stub.conf
+    content: |
+      [Resolve]
+      DNSStubListener=no
+    owner: root
+    group: root
+    mode: '0644'
+  when: resolved_disable_stub | default(true)
+  notify: reiniciar-resolved
+  tags: ["router", "dns"]
+
 - name: Habilitar IP forwarding IPv4 de forma persistente
   copy:
     dest: /etc/sysctl.d/99-router.conf
@@ -72,6 +85,16 @@
     state: started
     enabled: true
   tags: ["router", "nat", "firewall"]
+
+- name: Esperar a que la IP LAN esté configurada en {{ router_internal_interface }}
+  shell: ip -4 -o addr show dev {{ router_internal_interface }} | awk '{print $4}' | grep -q '^{{ router_internal_address }}/'
+  register: _lan_ip_ready
+  retries: 10
+  delay: 3
+  until: _lan_ip_ready.rc == 0
+  changed_when: false
+  when: router_network_persist | default(false)
+  tags: ["router", "network"]
 
 - name: Configurar dnsmasq (DHCP y DNS)
   template:

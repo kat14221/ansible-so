@@ -18,3 +18,8 @@
 - name: aplicar-red
   command: /sbin/ifup {{ router_internal_interface }}
   changed_when: false
+
+- name: reiniciar-networkd
+  systemd:
+    name: systemd-networkd
+    state: restarted

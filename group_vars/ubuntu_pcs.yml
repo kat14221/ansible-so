@@ -7,7 +7,7 @@ client_dns_servers:
 client_dns:
   - 10.10.10.1
   - 8.8.8.8
-client_interface: ens33  # ajusta según tu entorno
+client_interface: ens34  # ajusta según tu entorno
 client_prefix: 29         # /29 -> 255.255.255.248
 
 # UFW por host (firewall sencillo). Puedes deshabilitarlo si no lo necesitas.
