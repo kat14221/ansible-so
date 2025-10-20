@@ -16,6 +16,8 @@ router_internal_prefix: 29
 
 # dnsmasq (DHCP/DNS) en la LAN
 dnsmasq_enabled: true
+# En esta instalación mínima no está systemd-resolved, así que no desactivar stub
+resolved_disable_stub: false
 dnsmasq_domain: labb.local
 dnsmasq_dhcp_range_start: 10.10.10.5
 dnsmasq_dhcp_range_end: 10.10.10.6
